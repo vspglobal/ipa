@@ -1,6 +1,8 @@
 ![IPA](logo.png "IPA Logo")
 # (Improved Programming with APIs) 
 [![Build Status](https://travis-ci.org/vspglobal/ipa.svg)](https://travis-ci.org/vspglobal/ipa)
+
+<br/>
 This project contains various modules to aid in the development and consumption of APIs.   Follow the link on each module for details on how to use.
 
 **Module** | **Overview**
