@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.vspglobal.ipa</groupId>
+	<artifactId>ipa-parent</artifactId>
+	<version>1.3-SNAPSHOT</version>
+	<name>IPA Multi-Module</name>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>ipa-jaxrs-basicauth</module>
+		<module>ipa-jaxrs-oauth2</module>
+		<module>ipa-jaxrs-hystrix</module>
+		<module>ipa-jaxrs-util</module>
+		<module>ipa-domain</module>
+		<module>ipa-test</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- build version specified here for child builds -->
+		<jackson.version>2.1.1</jackson.version>
+		<joda.version>2.1</joda.version>
+		<junit.version>4.8.2</junit.version>
+		<mockito.version>1.9.5</mockito.version>
+		<scannotation.version>1.0.3</scannotation.version>
+		<slf4j.version>1.7.5</slf4j.version>
+		<jose.jwt.version>3.1</jose.jwt.version>
+		<hystrix.core.version>1.4.12</hystrix.core.version>
+		<hystrix.servo.version>1.4.12</hystrix.servo.version>
+		<servo.version>0.7.5</servo.version>
+		<reactivex.version>1.0.7</reactivex.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Hystrix -->
+			<dependency>
+				<groupId>com.netflix.hystrix</groupId>
+				<artifactId>hystrix-core</artifactId>
+				<version>${hystrix.core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.netflix.hystrix</groupId>
+				<artifactId>hystrix-servo-metrics-publisher</artifactId>
+				<version>${hystrix.servo.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.netflix.servo</groupId>
+				<artifactId>servo-core</artifactId>
+				<version>${servo.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.reactivex</groupId>
+				<artifactId>rxjava</artifactId>
+				<version>${reactivex.version}</version>
+			</dependency>
+
+			<!-- JWT -->
+		    <dependency>
+		         <groupId>com.nimbusds</groupId>
+		         <artifactId>nimbus-jose-jwt</artifactId>
+		         <version>${jose.jwt.version}</version>
+		    </dependency>
+
+			<!-- JAX-RS -->
+			<dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>javax.ws.rs-api</artifactId>
+				<version>2.0</version>
+			</dependency>
+
+			<!-- JACKSON -->
+			<dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+
+
+			<!-- MISC -->
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>${joda.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.scannotation</groupId>
+				<artifactId>scannotation</artifactId>
+				<version>${scannotation.version}</version>
+			</dependency>
+
+			<!-- TEST -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<configuration>
+						<archive>
+							<manifestEntries>
+								<Git-Revision>${GIT_COMMIT}</Git-Revision>
+								<Build-Id>${BUILD_ID}</Build-Id>
+								<Implementation-Build>${BUILD_NUMBER}</Implementation-Build>
+								<Implementation-Version>${project.version}</Implementation-Version>
+								<Implementation-Title>${project.artifactId}</Implementation-Title>
+								<Implementation-Vendor>${project.groupId}</Implementation-Vendor>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.jboss.jandex</groupId>
+					<artifactId>jandex-maven-plugin</artifactId>
+					<version>1.0.3</version>
+					<executions>
+						<execution>
+							<id>make-index</id>
+							<goals>
+								<goal>jandex</goal>
+							</goals>
+							<!-- phase is 'process-classes by default' -->
+							<configuration>
+								<!-- Nothing needed here for simple cases -->
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. 
+					https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html
+					-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jboss.jandex</groupId>
+										<artifactId>jandex-maven-plugin</artifactId>
+										<versionRange>[1.0.3,)</versionRange>
+										<goals>
+											<goal>jandex</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

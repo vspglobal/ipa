@@ -1,0 +1,12 @@
+
+{
+  "access_token": "32c790fc-7799-4ebc-9be9-78ec7999b9d9",
+  "token_type": "bearer",
+  "expires_in": 43199,
+  "provider_constraint": {
+    "provider_tax_id": "111111111",
+    "doctor_npi": "222222222"
+  },
+  "principal": "11111/test@test.com",
+  "user_type": "AFFILIATE"
+}
