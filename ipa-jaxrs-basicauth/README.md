@@ -8,7 +8,7 @@ Pull in the artifact via the following maven coordinates:
 ```
 <groupId>com.vspglobal.ipa</groupId>
 <artifactId>ipa-jaxrs-basicauth</artifactId>
-<version>1.0-SNAPSHOT</version>
+<version>1.3</version>
 ```
 
 Create a client with the filter registered as a provider:
