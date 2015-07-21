@@ -1,23 +1,22 @@
-import com.netflix.hystrix.HystrixCommand;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommandProperties;
-import com.vspglobal.ipa.jaxrs.hystrix.HystrixInvocation;
-import com.vspglobal.ipa.test.MockAPIServer;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+package com.vspglobal.ipa.jaxrs.hystrix;
+
+import static org.hamcrest.CoreMatchers.is;
+
+import java.util.concurrent.Future;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.is;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.vspglobal.ipa.jaxrs.hystrix.util.HystrixCommandSetterUtil;
+import com.vspglobal.ipa.test.MockAPIServer;
 
 /**
  * Created by casele on 4/28/15.
@@ -37,17 +36,6 @@ public class TestHystrixInvocation {
         api.stop();
     }
 
-    private HystrixCommand.Setter getSetter(String cmd, Integer requestTimeoutInSeconds) {
-        HystrixCommandProperties.Setter commandProperties = HystrixCommandProperties.Setter();
-        if(requestTimeoutInSeconds != null) {
-            commandProperties.withExecutionTimeoutInMilliseconds((int) TimeUnit.MILLISECONDS.convert(requestTimeoutInSeconds, TimeUnit.SECONDS));
-        }
-        HystrixCommand.Setter setter =
-                HystrixCommand.Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("RestInvocation"))
-                        .andCommandKey(HystrixCommandKey.Factory.asKey(cmd))
-                        .andCommandPropertiesDefaults(commandProperties);
-        return setter;
-    }
 
     @Test
     public void test404() {
@@ -55,7 +43,7 @@ public class TestHystrixInvocation {
             //setup client
             Client client = ClientBuilder.newBuilder().build();
             Invocation inv = client.target(api.resolve("/home")).request().buildGet();
-            Response resp =  HystrixInvocation.build(inv, getSetter("test404",null)).invoke();
+            Response resp =  HystrixInvocation.build(inv, HystrixCommandSetterUtil.getSetter("test404",null)).invoke();
 
             Assert.fail("Should have throws WebApplicationException");
         } catch (WebApplicationException wae) {
@@ -73,7 +61,7 @@ public class TestHystrixInvocation {
         try {
             Client client = ClientBuilder.newBuilder().build();
             Invocation inv = client.target(api.resolve("/force500")).request().buildGet();
-            Response resp =  HystrixInvocation.build(inv, getSetter("test500",null)).invoke();
+            Response resp =  HystrixInvocation.build(inv, HystrixCommandSetterUtil.getSetter("test500",null)).invoke();
 
             Assert.fail("Should have throws WebApplicationException");
         } catch (WebApplicationException wae) {
@@ -93,7 +81,7 @@ public class TestHystrixInvocation {
         try {
             Client client = ClientBuilder.newBuilder().build();
             Invocation inv = client.target(api.resolve("/timeout")).request().buildGet();
-            Response resp =  HystrixInvocation.build(inv, getSetter("testTimeout",2)).invoke();
+            Response resp =  HystrixInvocation.build(inv, HystrixCommandSetterUtil.getSetter("testTimeout",2)).invoke();
 
             Assert.fail("Should have throws WebApplicationException");
         } catch (WebApplicationException wae) {
@@ -115,7 +103,7 @@ public class TestHystrixInvocation {
             try {
                 Client client = ClientBuilder.newBuilder().build();
                 Invocation inv = client.target(api.resolve("/circuitBreaker")).request().buildGet();
-                Response resp =  HystrixInvocation.build(inv, getSetter("testCircuit",1)).invoke();
+                Response resp =  HystrixInvocation.build(inv, HystrixCommandSetterUtil.getSetter("testCircuit",1)).invoke();
 
                 Assert.fail("Should have throws WebApplicationException");
             } catch (WebApplicationException wae) {
@@ -143,7 +131,7 @@ public class TestHystrixInvocation {
 
         Client client = ClientBuilder.newBuilder().build();
         Invocation inv = client.target(api.resolve("/circuitBreaker")).request().buildGet();
-        Response resp =  HystrixInvocation.build(inv, getSetter("testCircuit",1)).invoke();
+        Response resp =  HystrixInvocation.build(inv, HystrixCommandSetterUtil.getSetter("testCircuit",1)).invoke();
 
         Assert.assertNotNull(resp);
         Assert.assertThat("status",resp.getStatus(),is(200));
@@ -158,7 +146,7 @@ public class TestHystrixInvocation {
         //execute
         Client client = ClientBuilder.newBuilder().build();
         Invocation inv = client.target(api.resolve("/home")).request().buildGet();
-        Response resp =  HystrixInvocation.build(inv, getSetter("testHome",null)).invoke();
+        Response resp =  HystrixInvocation.build(inv, HystrixCommandSetterUtil.getSetter("testHome",null)).invoke();
 
         // assert
         Assert.assertNotNull(resp);
@@ -172,7 +160,7 @@ public class TestHystrixInvocation {
         //execute
         Client client = ClientBuilder.newBuilder().build();
         Invocation inv = client.target(api.resolve("/home")).request().buildGet();
-        Future<Response> respF =  HystrixInvocation.build(inv, getSetter("testHomeAsync",null)).submit();
+        Future<Response> respF =  HystrixInvocation.build(inv, HystrixCommandSetterUtil.getSetter("testHomeAsync",null)).submit();
 
         // assert
         try {
