@@ -1,23 +1,26 @@
-import com.netflix.hystrix.HystrixCommand;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommandProperties;
-import com.vspglobal.ipa.jaxrs.hystrix.HystrixInvocation;
-import com.vspglobal.ipa.test.MockAPIServer;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+package com.vspglobal.ipa.jaxrs.hystrix;
+
+import static org.hamcrest.CoreMatchers.is;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.is;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.HystrixCommandGroupKey;
+import com.netflix.hystrix.HystrixCommandKey;
+import com.netflix.hystrix.HystrixCommandProperties;
+import com.vspglobal.ipa.test.MockAPIServer;
 
 /**
  * Created by casele on 4/28/15.

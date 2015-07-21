@@ -1,6 +1,7 @@
 package com.vspglobal.ipa.jaxrs.hystrix;
 
 import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.exception.HystrixBadRequestException;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Invocation;
@@ -26,11 +27,22 @@ public class InvocationCommand extends HystrixCommand<Response> {
    @Override
    protected Response run() throws Exception {
       Response response = invocation.invoke();
+      int status = response.getStatus();
 
-      if (response.getStatus() < 400) {
+      if (isSuccessful(status)) {
          return response;
+      } else if(isClientError(status)) {
+    	  throw new HystrixBadRequestException("Bad request. Client error.", new WebApplicationException(response.getStatus())); 
       } else {
          throw new WebApplicationException(response);
       }
+   }
+   
+   private boolean isSuccessful(int status){
+	   return status < 400; 
+   }
+   
+   private boolean isClientError(int status){
+	   return status >= 400 && status < 500; 
    }
 }
