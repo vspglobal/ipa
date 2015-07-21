@@ -8,5 +8,5 @@ Pull in the artifact via the following maven coordinates:
 ```
 <groupId>com.vspglobal.ipa</groupId>
 <artifactId>ipa-jaxrs-util</artifactId>
-<version>1.3</version>
+<version>1.4</version>
 ```
