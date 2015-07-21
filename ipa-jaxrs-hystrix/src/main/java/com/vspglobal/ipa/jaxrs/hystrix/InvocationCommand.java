@@ -32,7 +32,7 @@ public class InvocationCommand extends HystrixCommand<Response> {
       if (isSuccessful(status)) {
          return response;
       } else if(isClientError(status)) {
-    	  throw new HystrixBadRequestException("Bad request. Client error.", new WebApplicationException(response.getStatus())); 
+    	  throw new HystrixBadRequestException("Bad request. Client error.", new WebApplicationException(response)); 
       } else {
          throw new WebApplicationException(response);
       }

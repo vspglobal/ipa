@@ -352,11 +352,7 @@ public class HystrixInvocation implements Invocation {
          } else if(ex instanceof TimeoutException) {
             rtn =  new WebApplicationException(ex, Response.Status.GATEWAY_TIMEOUT);
             logger.warn("HystrixInvocation caused WebApplicationException cmd="+commandName+" http_status="+rtn.getResponse().getStatus()+" failure_type=TimeoutException message="+ex.getMessage());
-         } else if (ex instanceof HystrixBadRequestException){
-        	rtn = (WebApplicationException) ex.getCause();
-        	logger.warn("HystrixInvocation caused WebApplicationException cmd="+commandName+" http_status="+rtn.getResponse().getStatus()+" failure_type=TimeoutException message="+ex.getMessage());
-         }
-         else if(ex instanceof HystrixRuntimeException) {
+         } else if(ex instanceof HystrixRuntimeException) {
             switch(((HystrixRuntimeException)ex).getFailureType()) {
                case COMMAND_EXCEPTION:
                   break;
