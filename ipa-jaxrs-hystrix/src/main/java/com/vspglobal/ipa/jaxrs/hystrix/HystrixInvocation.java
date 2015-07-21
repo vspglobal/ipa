@@ -1,13 +1,16 @@
 package com.vspglobal.ipa.jaxrs.hystrix;
 
 import com.netflix.hystrix.HystrixCommand.Setter;
+import com.netflix.hystrix.exception.HystrixBadRequestException;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
+
 import java.util.Locale;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
@@ -349,11 +352,12 @@ public class HystrixInvocation implements Invocation {
          } else if(ex instanceof TimeoutException) {
             rtn =  new WebApplicationException(ex, Response.Status.GATEWAY_TIMEOUT);
             logger.warn("HystrixInvocation caused WebApplicationException cmd="+commandName+" http_status="+rtn.getResponse().getStatus()+" failure_type=TimeoutException message="+ex.getMessage());
-         } else if(ex instanceof HystrixRuntimeException) {
+         } else if (ex instanceof HystrixBadRequestException){
+        	rtn = (WebApplicationException) ex.getCause();
+        	logger.warn("HystrixInvocation caused WebApplicationException cmd="+commandName+" http_status="+rtn.getResponse().getStatus()+" failure_type=TimeoutException message="+ex.getMessage());
+         }
+         else if(ex instanceof HystrixRuntimeException) {
             switch(((HystrixRuntimeException)ex).getFailureType()) {
-               case BAD_REQUEST_EXCEPTION:
-                  rtn =  new WebApplicationException(ex, Response.Status.BAD_REQUEST);
-                  break;
                case COMMAND_EXCEPTION:
                   break;
                case TIMEOUT:
