@@ -1,8 +1,6 @@
 package com.vspglobal.ipa.jaxrs.hystrix;
 import static org.hamcrest.CoreMatchers.is;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -13,12 +11,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.netflix.hystrix.HystrixCommand;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.exception.HystrixBadRequestException;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
+import com.vspglobal.ipa.jaxrs.hystrix.util.HystrixCommandSetterUtil;
 import com.vspglobal.ipa.test.MockAPIServer;
 
 public class TestInvocationCommand {
@@ -38,23 +33,11 @@ public class TestInvocationCommand {
         api.stop();
     }
 
-    private HystrixCommand.Setter getSetter(String cmd, Integer requestTimeoutInSeconds) {
-        HystrixCommandProperties.Setter commandProperties = HystrixCommandProperties.Setter();
-        if(requestTimeoutInSeconds != null) {
-            commandProperties.withExecutionTimeoutInMilliseconds((int) TimeUnit.MILLISECONDS.convert(requestTimeoutInSeconds, TimeUnit.SECONDS));
-        }
-        HystrixCommand.Setter setter =
-                HystrixCommand.Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("RestInvocation"))
-                        .andCommandKey(HystrixCommandKey.Factory.asKey(cmd))
-                        .andCommandPropertiesDefaults(commandProperties);
-        return setter;
-    }
-
     @Test
     public void test404() {
         try {
             Invocation inv = client.target(api.resolve("/home")).request().buildGet();
-            InvocationCommand command = new InvocationCommand(getSetter("test404",null), inv);
+            InvocationCommand command = new InvocationCommand(HystrixCommandSetterUtil.getSetter("test404",null), inv);
             command.execute();
 
             Assert.fail("Should have throws HystrixBadRequestException");
@@ -73,7 +56,7 @@ public class TestInvocationCommand {
     	
         try {
 		    Invocation inv = client.target(api.resolve("/home")).request().buildGet();
-		    InvocationCommand command = new InvocationCommand(getSetter("test400",null), inv);
+		    InvocationCommand command = new InvocationCommand(HystrixCommandSetterUtil.getSetter("test400",null), inv);
 		    command.execute();
 		    Assert.fail("Should have throws HystrixBadRequestException");
         
@@ -92,7 +75,7 @@ public class TestInvocationCommand {
 
         try {
             Invocation inv = client.target(api.resolve("/500error")).request().buildGet();
-            InvocationCommand command = new InvocationCommand(getSetter("500error",null), inv);
+            InvocationCommand command = new InvocationCommand(HystrixCommandSetterUtil.getSetter("500error",null), inv);
             command.execute();
             
             Assert.fail("Should have throws HystrixRuntimeException");
