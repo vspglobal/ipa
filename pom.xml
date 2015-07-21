@@ -5,7 +5,7 @@
 
     <groupId>com.vspglobal.ipa</groupId>
     <artifactId>ipa-parent</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
     <name>IPA</name>
     <packaging>pom</packaging>
 
