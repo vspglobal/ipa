@@ -9,6 +9,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
@@ -54,7 +55,11 @@ public class MockAPIServer {
         return this;
     }
     public MockAPIServer registerEntity(String path, Object entity) {
-        register(path, Response.ok(entity).build());
+        register(path, Response.ok(entity).type("application/json").build());
+        return this;
+    }
+    public MockAPIServer registerEntity(String path, Object entity, MediaType contentType) {
+        register(path, Response.ok(entity).type(contentType).build());
         return this;
     }
     public MockAPIServer withDelayInMillis(long delayInMillis) {
@@ -104,7 +109,10 @@ public class MockAPIServer {
                 if(resp.hasEntity()) {
                     ObjectMapper mapper = new ObjectMapper();
                     Object entity = resp.getEntity();
-                    response.setContentType("application/json");
+                    if(resp.getMediaType() != null)
+                        response.setContentType(resp.getMediaType().toString());
+                    else
+                        response.setContentType("application/json");
                     mapper.writeValue(response.getWriter(), entity);
                 }
                 baseRequest.setHandled(true);

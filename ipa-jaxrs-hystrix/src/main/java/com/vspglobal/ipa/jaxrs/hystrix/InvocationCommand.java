@@ -5,6 +5,7 @@ import com.netflix.hystrix.exception.HystrixBadRequestException;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Response;
 
 /**
@@ -26,16 +27,33 @@ public class InvocationCommand extends HystrixCommand<Response> {
 
    @Override
    protected Response run() throws Exception {
-      Response response = invocation.invoke();
+      Response response;
+      try {
+         response = invocation.invoke();
+      } catch (ResponseProcessingException rpe) {
+         if(rpe.getResponse() != null && isClientError(rpe.getResponse().getStatus())) {
+            throw new HystrixBadRequestException("Bad request. Client error.", rpe);
+         } else {
+            throw rpe;
+         }
+      } catch (WebApplicationException wae) {
+         if(wae.getResponse() != null && isClientError(wae.getResponse().getStatus())) {
+            throw new HystrixBadRequestException("Bad request. Client error.", wae);
+         } else {
+            throw wae;
+         }
+      }
+
       int status = response.getStatus();
 
       if (isSuccessful(status)) {
          return response;
       } else if(isClientError(status)) {
-    	  throw new HystrixBadRequestException("Bad request. Client error.", new WebApplicationException(response)); 
+         throw new HystrixBadRequestException("Bad request. Client error.", new WebApplicationException(response));
       } else {
          throw new WebApplicationException(response);
       }
+
    }
    
    private boolean isSuccessful(int status){
