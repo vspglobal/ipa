@@ -8,5 +8,5 @@ Pull in the artifact via the following maven coordinates:
 ```
 <groupId>com.vspglobal.ipa</groupId>
 <artifactId>ipa-domain</artifactId>
-<version>1.4</version>
+<version>1.5</version>
 ```
