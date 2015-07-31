@@ -28,10 +28,14 @@ public class MockAPIServer {
 
     public MockAPIServer() {
     }
-
+    
     public void start() throws Exception {
+    		start(port);
+    }
+
+    public void start(int startPort) throws Exception {
         if(server == null) {
-            server = new Server(port);
+            server = new Server(startPort);
             server.setHandler(new AbstractHandler() {
                 @Override
                 public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
