@@ -5,7 +5,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
@@ -25,9 +24,6 @@ import com.vspglobal.ipa.jaxrs.util.BuilderDecorator;
 
 public class AccessTokenRequester {
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
-
-	private static final Object[] providers = new Object[] {new AccessTokenReader(), new HttpBasicAuthFilter()};
 	private static BuilderDecorator builderDecorator = null;
 
 
