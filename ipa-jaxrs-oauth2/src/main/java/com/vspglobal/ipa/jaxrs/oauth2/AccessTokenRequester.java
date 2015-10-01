@@ -114,6 +114,7 @@ public class AccessTokenRequester {
 
 
 			client = clientPool.borrowObject();
+			log.info("************* Active Connection In the Pool "+ clientPool.getNumActive() +" idle : "+ clientPool.getNumIdle());
 			Invocation req;
 
 			if(grant_type == GrantType.GET_TOKEN) {
@@ -172,10 +173,13 @@ public class AccessTokenRequester {
 		}finally{
 			try {
 				clientPool.returnObject(client);
+				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				log.error("*************** Error in returning the object to pool", e );
 			}
+			log.info("************* Active Connection In the Pool "+ clientPool.getNumActive() +" idle : "+ clientPool.getNumIdle());
+			
 		}
 		
 		if(tok.getError() != null && tok.getError().length()>0) {
