@@ -1,19 +1,27 @@
 package com.vspglobal.ipa.jaxrs.oauth2;
 
-import com.vspglobal.ipa.jaxrs.basicauth.HttpBasicAuthFilter;
-import com.vspglobal.ipa.domain.OAuth2Token;
-import com.vspglobal.ipa.jaxrs.util.BuilderDecorator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.URI;
+import java.util.Hashtable;
+import java.util.Map;
 
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.util.Hashtable;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vspglobal.ipa.domain.OAuth2Token;
+import com.vspglobal.ipa.jaxrs.basicauth.HttpBasicAuthFilter;
+import com.vspglobal.ipa.jaxrs.util.BuilderDecorator;
+import com.vspglobal.ipa.jaxrs.util.pool.ClientGenObjectPool;
+import com.vspglobal.ipa.jaxrs.util.pool.ClientPoolConfig;
+import com.vspglobal.ipa.jaxrs.util.pool.ClientPoolObjectFactory;
 
 public class AccessTokenRequester {
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -28,6 +36,9 @@ public class AccessTokenRequester {
 	private String client_secret;
 	private GrantType grant_type;
 
+	
+	private static ClientGenObjectPool clientPool = new ClientGenObjectPool(new ClientPoolObjectFactory(providers), new ClientPoolConfig());
+	
 
 	private URI tokenEndpoint;
 
@@ -97,22 +108,10 @@ public class AccessTokenRequester {
 		
 		OAuth2Token tok;
 		Response response=null;
+		Client client  = null;
 		try {
-
-
-
 			long start = System.currentTimeMillis();
-
-
-			ClientBuilder clientBuilder = ClientBuilder.newBuilder();
-			if(providers != null) {
-				for(Object provider: providers) {
-					clientBuilder = clientBuilder.register(provider);
-				}
-			}
-
-
-			Client client = clientBuilder.build();
+			client = clientPool.borrowObject();
 			Invocation req;
 
 			if(grant_type == GrantType.GET_TOKEN) {
@@ -168,6 +167,15 @@ public class AccessTokenRequester {
 			if(response != null) {
 				response.close();
 			}
+		}finally{
+			try {
+				clientPool.returnObject(client);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				log.error("Error in returning the object to pool", e );
+			}
+			
 		}
 		
 		if(tok.getError() != null && tok.getError().length()>0) {
@@ -181,6 +189,7 @@ public class AccessTokenRequester {
 		this.tokenEndpoint= tokenEndpoint;
 		return this;
 	}
+	
 	
 	
 }
