@@ -10,7 +10,6 @@ public class ClientGenObjectPool extends GenericObjectPool<Client> {
 
 	public ClientGenObjectPool(PooledObjectFactory<Client> factory, GenericObjectPoolConfig config) {
 		super(factory, config);
-		// TODO Auto-generated constructor stub
 	}
 
 }

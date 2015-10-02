@@ -9,7 +9,6 @@ public class ClientSofRefPool extends SoftReferenceObjectPool<Client> {
 
 	public ClientSofRefPool(PooledObjectFactory<Client> factory) {
 		super(factory);
-		// TODO Auto-generated constructor stub
 	}
 	
 	
