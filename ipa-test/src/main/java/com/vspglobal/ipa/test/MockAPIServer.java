@@ -25,13 +25,18 @@ public class MockAPIServer {
     private Map<String,Response> paths = new HashMap<String,Response>();
     private long delayInMillis;
     private Map<String,String> authorizationHeaders = new HashMap<String,String>();
-
+    private Map<String,Long> pathsWithTimeout = new HashMap<String,Long>();
+    
     public MockAPIServer() {
     }
-
+    
     public void start() throws Exception {
+    		start(port);
+    }
+
+    public void start(int startPort) throws Exception {
         if(server == null) {
-            server = new Server(port);
+            server = new Server(startPort);
             server.setHandler(new AbstractHandler() {
                 @Override
                 public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
@@ -48,6 +53,12 @@ public class MockAPIServer {
             server.join();
             port = 0;
         }
+    }
+    
+    public MockAPIServer registerStatusAndTimeout(String path, int status, long timeout) {
+    	this.pathsWithTimeout.put(path,timeout);
+        register(path, Response.status(status).build());
+        return this;
     }
 
     public MockAPIServer registerStatus(String path, int status) {
@@ -84,7 +95,19 @@ public class MockAPIServer {
             throws IOException, ServletException
     {
         try {
-            Thread.currentThread().sleep(this.delayInMillis);
+        	boolean alreadyDelayed = false;
+        	for(Map.Entry<String, Long> pathWithTimeout : this.pathsWithTimeout.entrySet()) {
+        		String currentPath = pathWithTimeout.getKey();
+        		long currentPathTimeout = pathWithTimeout.getValue();
+        		       		
+        		if(target.matches(currentPath) && !alreadyDelayed){
+            		Thread.currentThread().sleep(currentPathTimeout);
+            		alreadyDelayed = true;
+        		} 
+        	}
+        	if(!alreadyDelayed) {
+            	Thread.currentThread().sleep(this.delayInMillis);
+        	}    		
         } catch (InterruptedException e) {
             throw new ServletException(e);
         }

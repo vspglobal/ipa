@@ -8,5 +8,16 @@ Pull in the artifact via the following maven coordinates:
 ```
 <groupId>com.vspglobal.ipa</groupId>
 <artifactId>ipa-test</artifactId>
-<version>1.4</version>
+<version>1.5</version>
 ```
+# MockAPIServer
+
+```
+withDelayInMillis(long delayInMillis)
+```
+Adds a delay for all paths before API call. 
+
+```
+registerStatusAndTimeout(String path, int status, long timeout)
+```
+Adds a timeout for a specific path that will be used instead of what is declared by withDelayInMillis(long delayInMillis)

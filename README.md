@@ -1,6 +1,7 @@
 ![IPA](logo.png "IPA Logo")
 # (Improved Programming with APIs) 
 [![Build Status](https://travis-ci.org/vspglobal/ipa.svg)](https://travis-ci.org/vspglobal/ipa)
+[![Maven Central](https://img.shields.io/maven-central/v/com.vspglobal.ipa/ipa-parent.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.vspglobal.ipa%22)
 
 <br/>
 This project contains various modules to aid in the development and consumption of APIs.   Follow the link on each module for details on how to use.
