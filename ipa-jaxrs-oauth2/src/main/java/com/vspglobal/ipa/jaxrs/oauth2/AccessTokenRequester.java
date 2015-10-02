@@ -18,12 +18,16 @@ import org.slf4j.LoggerFactory;
 
 import com.vspglobal.ipa.domain.OAuth2Token;
 import com.vspglobal.ipa.jaxrs.basicauth.HttpBasicAuthFilter;
-import com.vspglobal.ipa.jaxrs.oauth2.pool.ClientPoolObjectFactory;
-import com.vspglobal.ipa.jaxrs.oauth2.pool.ClientSofRefPool;
 import com.vspglobal.ipa.jaxrs.util.BuilderDecorator;
+import com.vspglobal.ipa.jaxrs.util.pool.ClientGenObjectPool;
+import com.vspglobal.ipa.jaxrs.util.pool.ClientPoolConfig;
+import com.vspglobal.ipa.jaxrs.util.pool.ClientPoolObjectFactory;
 
 public class AccessTokenRequester {
 	private Logger log = LoggerFactory.getLogger(getClass());
+	
+
+	private static final Object[] providers = new Object[] {new AccessTokenReader(), new HttpBasicAuthFilter()};
 	private static BuilderDecorator builderDecorator = null;
 
 
@@ -32,9 +36,8 @@ public class AccessTokenRequester {
 	private String client_secret;
 	private GrantType grant_type;
 
-	private static ClientPoolObjectFactory clientPoolFactory = new ClientPoolObjectFactory();
-
-	private static ClientSofRefPool clientPool = new ClientSofRefPool(clientPoolFactory);
+	
+	private static ClientGenObjectPool clientPool = new ClientGenObjectPool(new ClientPoolObjectFactory(providers), new ClientPoolConfig());
 	
 
 	private URI tokenEndpoint;
@@ -107,14 +110,8 @@ public class AccessTokenRequester {
 		Response response=null;
 		Client client  = null;
 		try {
-
-
-
 			long start = System.currentTimeMillis();
-
-
 			client = clientPool.borrowObject();
-			log.info("************* Active Connection In the Pool "+ clientPool.getNumActive() +" idle : "+ clientPool.getNumIdle());
 			Invocation req;
 
 			if(grant_type == GrantType.GET_TOKEN) {
@@ -176,9 +173,8 @@ public class AccessTokenRequester {
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				log.error("*************** Error in returning the object to pool", e );
+				log.error("Error in returning the object to pool", e );
 			}
-			log.info("************* Active Connection In the Pool "+ clientPool.getNumActive() +" idle : "+ clientPool.getNumIdle());
 			
 		}
 		
@@ -193,6 +189,7 @@ public class AccessTokenRequester {
 		this.tokenEndpoint= tokenEndpoint;
 		return this;
 	}
+	
 	
 	
 }

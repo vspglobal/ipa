@@ -1,4 +1,4 @@
-package com.vspglobal.ipa.jaxrs.oauth2.pool;
+package com.vspglobal.ipa.jaxrs.util.pool;
 
 import javax.ws.rs.client.Client;
 
