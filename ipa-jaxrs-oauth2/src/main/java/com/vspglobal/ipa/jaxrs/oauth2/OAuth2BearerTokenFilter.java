@@ -6,6 +6,7 @@ import com.vspglobal.ipa.domain.OAuth2Token;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
 
@@ -53,17 +54,20 @@ public class OAuth2BearerTokenFilter implements ClientRequestFilter,ClientRespon
 		AccessTokenProvider tokenProvider = (AccessTokenProvider) requestContext.getProperty(OAUTH2_TOKEN_PROVIDER);
 		URI tokenEndpoint = (URI) requestContext.getProperty(OAUTH2_TOKEN_ENDPOINT);
 		if (responseContext.getStatus() == 401) {
-			refreshToken(tokenProvider, tokenEndpoint);
+			try {
+				refreshToken(tokenProvider, tokenEndpoint);
+			} catch (Exception ex) {} //swallow
+
 			throw new WebApplicationException(responseContext.getStatus());
 		}
 	}
 
-	private OAuth2Token refreshToken(AccessTokenProvider tokenProvider, URI tokenEndpoint) {
+	private OAuth2Token refreshToken(AccessTokenProvider tokenProvider, URI tokenEndpoint) throws Exception {
 		if(tokenProvider == null)
 			return null;
 
-		tokenProvider.refresh(tokenEndpoint);
-		return tokenProvider.get();
+        tokenProvider.refresh(tokenEndpoint);
+        return tokenProvider.get();
 	}
 	private OAuth2Token getToken(AccessTokenProvider tokenProvider, URI tokenEndpoint) {
 		if(tokenProvider == null)
@@ -71,7 +75,14 @@ public class OAuth2BearerTokenFilter implements ClientRequestFilter,ClientRespon
 
 		OAuth2Token token = tokenProvider.get();
 		if(token == null || token.isExpired()) {
-			return refreshToken(tokenProvider, tokenEndpoint);
+			try {
+				return refreshToken(tokenProvider, tokenEndpoint);
+			} catch (WebApplicationException wae) {
+				throw wae;
+            } catch (Exception ex) {
+				// unable to refresh
+                throw new WebApplicationException(ex, Response.status(400).build());
+            }
 		}
 
 		return token;
