@@ -9,7 +9,7 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 public class ClientPoolObjectFactory extends BasePooledObjectFactory<Client> {
 
-	private static  Object[] providers = new Object[] {};
+	private  Object[] providers = new Object[] {};
 
 	
 	public ClientPoolObjectFactory(Object[] providersArg ) {
@@ -32,5 +32,7 @@ public class ClientPoolObjectFactory extends BasePooledObjectFactory<Client> {
 	public PooledObject<Client> wrap(Client client) {
 		 return new DefaultPooledObject<Client>(client);
 	}
+	
+	
 
 }
