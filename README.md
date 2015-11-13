@@ -26,3 +26,5 @@ Please [create an issue](https://github.com/vspglobal/ipa/issues) for any bugs y
 IP is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 For additional information, see the [LICENSE](LICENSE) file.
+
+1.6.5

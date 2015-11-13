@@ -4,7 +4,7 @@
 
     <groupId>com.vspglobal.ipa</groupId>
     <artifactId>ipa-parent</artifactId>
-    <version>1.6.2</version>
+    <version>1.7-SNAPSHOT</version>
     <name>IPA</name>
     <packaging>pom</packaging>
 
@@ -207,6 +207,27 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <basedir>${pom.basedir}</basedir>
+                    <filesToInclude>**/README.md</filesToInclude>
+                    <token>&lt;version&gt;.+&lt;/version&gt;</token>
+                    <value>&lt;version&gt;${version}&lt;/version&gt;</value>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <distributionManagement>

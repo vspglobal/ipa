@@ -8,7 +8,7 @@ Pull in the artifact via the following maven coordinates:
 ```
 <groupId>com.vspglobal.ipa</groupId>
 <artifactId>ipa-jaxrs-hystrix</artifactId>
-<version>1.6.2</version>
+<version>1.7-SNAPSHOT</version>
 ```
 
 Next, [configure](https://github.com/Netflix/Hystrix/wiki/Configuration) the Hystrix setter:
