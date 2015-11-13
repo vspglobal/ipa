@@ -37,7 +37,7 @@ public class AccessTokenRequester {
 	private GrantType grant_type;
 
 	
-	private static ClientGenObjectPool clientPool = new ClientGenObjectPool(new ClientPoolObjectFactory(providers), new ClientPoolConfig());
+	private static ClientGenObjectPool clientPool = new ClientGenObjectPool(new ClientPoolObjectFactory(providers), new ClientPoolConfig("accessTokenRequester"));
 	
 
 	private URI tokenEndpoint;
