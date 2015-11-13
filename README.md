@@ -27,4 +27,3 @@ IP is licensed under the [Apache License, Version 2.0](http://www.apache.org/lic
 
 For additional information, see the [LICENSE](LICENSE) file.
 
-1.6.5
