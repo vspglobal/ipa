@@ -35,8 +35,7 @@ public class AccessTokenRequester {
 	private String client_id;
 	private String client_secret;
 	private GrantType grant_type;
-
-	
+		
 	private static ClientGenObjectPool clientPool = new ClientGenObjectPool(new ClientPoolObjectFactory(providers), new ClientPoolConfig("accessTokenRequester"));
 	
 
@@ -104,16 +103,16 @@ public class AccessTokenRequester {
 	public OAuth2Token request() {
 		final String client_id = this.client_id;
 		final String client_secret = this.client_secret;
+		boolean returnClientObjToPool = false;
 
 		
 		OAuth2Token tok;
 		Response response=null;
 		Client client  = null;
 		try {
-			long start = System.currentTimeMillis();
+			long start = System.currentTimeMillis();			
 			client = clientPool.borrowObject();
 			Invocation req;
-
 			if(grant_type == GrantType.GET_TOKEN) {
 				WebTarget webTarget = client.target(UriBuilder.fromUri(tokenEndpoint).path("/" + formparams.get("token")));
 				Invocation.Builder builder = webTarget.request(MediaType.APPLICATION_JSON_TYPE);
@@ -121,7 +120,6 @@ public class AccessTokenRequester {
 					builder = builderDecorator.decorate(builder);
 				}
 				req = builder.buildGet();
-
 			} else {
 				WebTarget webTarget = client.target(UriBuilder.fromUri(tokenEndpoint));
 				Form form = new Form();
@@ -147,15 +145,13 @@ public class AccessTokenRequester {
 			if(client_id != null && !client_id.isEmpty() && client_secret != null && !client_secret.isEmpty()) {
 				HttpBasicAuthFilter.applyProperties(req, client_id, client_secret);
 			}
-
 			response = req.invoke();
-
             tok = response.readEntity(MappableOAuth2Token.class);
+            returnClientObjToPool = true;
 
 			if(grant_type == GrantType.CLIENT_CREDENTIALS) {
 				tok.setClient_id(client_id);
 				tok.setScope(formparams.get("scope"));
-
 			}
 			
 			log.info("GRANT_REQUEST("+this.grant_type.name()+"): resp_time="+(System.currentTimeMillis() - start));
@@ -169,8 +165,11 @@ public class AccessTokenRequester {
 			}
 		}finally{
 			try {
-				clientPool.returnObject(client);
-				
+				if( returnClientObjToPool) {
+					clientPool.returnObject(client);
+				}else{
+					clientPool.invalidateObject(client);
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				log.error("Error in returning the object to pool", e );
