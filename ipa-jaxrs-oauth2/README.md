@@ -8,7 +8,7 @@ Pull in the artifact via the following maven coordinates:
 ```
 <groupId>com.vspglobal.ipa</groupId>
 <artifactId>ipa-jaxrs-oauth2</artifactId>
-<version>1.7-SNAPSHOT</version>
+<version>1.6.3</version>
 ```
 
 First you'll need to create a token provider based on which OAuth 2.0 grant type is needed.  Currently, only client credentials, resource owner credentials and authorization code are supported.
